@@ -29,14 +29,7 @@ public class AdicionadorLinkCliente implements AdicionadorLink<Cliente> {
 							.obterClientes())
 					.withSelfRel();
 			cliente.add(linkProprioObterClientes);
-			
-			Link linkProprioCadastrarCliente = WebMvcLinkBuilder
-					.linkTo(WebMvcLinkBuilder
-							.methodOn(ClienteControle.class)
-							.cadastrarCliente(cliente))
-					.withSelfRel();
-			cliente.add(linkProprioCadastrarCliente);
-			
+					
 			Link linkProprioAtualizarCliente = WebMvcLinkBuilder
 					.linkTo(WebMvcLinkBuilder
 							.methodOn(ClienteControle.class)
@@ -70,13 +63,6 @@ public class AdicionadorLinkCliente implements AdicionadorLink<Cliente> {
 				.withRel("clientes");
 		objeto.add(linkProprioObterClientes);
 		
-		Link linkProprioCadastrarCliente = WebMvcLinkBuilder
-				.linkTo(WebMvcLinkBuilder
-						.methodOn(ClienteControle.class)
-						.cadastrarCliente(objeto))
-				.withRel("cadastrar");
-		objeto.add(linkProprioCadastrarCliente);
-		
 		Link linkProprioAtualizarCliente = WebMvcLinkBuilder
 				.linkTo(WebMvcLinkBuilder
 						.methodOn(ClienteControle.class)
@@ -92,4 +78,12 @@ public class AdicionadorLinkCliente implements AdicionadorLink<Cliente> {
 		objeto.add(linkProprioExcluirCliente);
 		
 	}
+
+	@Override
+	public void adicionarLink(Cliente objeto, Cliente cliente) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

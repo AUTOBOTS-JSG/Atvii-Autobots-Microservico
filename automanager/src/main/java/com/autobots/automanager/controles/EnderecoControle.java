@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.autobots.automanager.adicionadores.AdicionadorLinkEndereco;
 import com.autobots.automanager.entidades.Cliente;
 import com.autobots.automanager.entidades.Endereco;
+import com.autobots.automanager.modelo.ClienteEnderecoSelecionador;
 import com.autobots.automanager.modelo.EnderecoAtualizador;
 import com.autobots.automanager.modelo.EnderecoSelecionador;
 import com.autobots.automanager.repositorios.ClienteRepositorio;
@@ -32,6 +33,8 @@ public class EnderecoControle {
 	@Autowired
 	private EnderecoSelecionador selecionadorEndereco;
 	@Autowired
+	private ClienteEnderecoSelecionador selecionadorCliEndereco;
+	@Autowired
 	private AdicionadorLinkEndereco adicionadorLinkEndereco;
 	
 	@GetMapping("/endereco/{id}")
@@ -43,6 +46,9 @@ public class EnderecoControle {
 			return resposta;
 		} else {
 			adicionadorLinkEndereco.adicionarLink(endereco);
+			List<Cliente> clientes = repositorioCliente.findAll();
+			Cliente	cliente = selecionadorCliEndereco.selecionar(clientes, endereco);
+			adicionadorLinkEndereco.adicionarLink(endereco, cliente);
 			ResponseEntity<Endereco> resposta = new ResponseEntity<Endereco>(endereco, HttpStatus.FOUND);
 			return resposta;
 		}
@@ -57,6 +63,11 @@ public class EnderecoControle {
 			return resposta;
 		} else {
 			adicionadorLinkEndereco.adicionarLink(enderecos);
+			List<Cliente> clientes = repositorioCliente.findAll();
+			for (Endereco endereco : enderecos) {
+				Cliente	cliente = selecionadorCliEndereco.selecionar(clientes, endereco);
+				adicionadorLinkEndereco.adicionarLink(endereco, cliente);
+			}
 			ResponseEntity<List<Endereco>> resposta = new ResponseEntity<>(enderecos, HttpStatus.FOUND);
 			return resposta;
 		}
@@ -84,6 +95,7 @@ public class EnderecoControle {
 			EnderecoAtualizador atualizador = new EnderecoAtualizador();
 			atualizador.atualizar(endereco, atualizacao);
 			repositorioEndereco.save(endereco);
+			adicionadorLinkEndereco.adicionarLink(endereco);
 			status = HttpStatus.OK;
 		} else {
 			status = HttpStatus.BAD_REQUEST;
@@ -98,6 +110,7 @@ public class EnderecoControle {
 		if (cliente.getEndereco()!= null) {
 		    cliente.setEndereco(null);
 		    repositorioCliente.save(cliente);
+		    adicionadorLinkEndereco.adicionarLink(cliente.getEndereco(), cliente);
 			status = HttpStatus.OK;
 		}
 		return new ResponseEntity<>(status);

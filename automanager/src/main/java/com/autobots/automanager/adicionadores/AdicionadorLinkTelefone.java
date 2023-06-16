@@ -7,6 +7,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import com.autobots.automanager.controles.TelefoneControle;
+import com.autobots.automanager.entidades.Cliente;
 import com.autobots.automanager.entidades.Telefone;
 
 @Component
@@ -29,14 +30,7 @@ public class AdicionadorLinkTelefone implements AdicionadorLink<Telefone> {
 							.obterTelefones())
 					.withSelfRel();
 			telefone.add(linkProprioObterTelefones);
-			
-			Link linkProprioCadastrarTelefone = WebMvcLinkBuilder
-					.linkTo(WebMvcLinkBuilder
-							.methodOn(TelefoneControle.class)
-							.cadastrarTelefone(telefone, id))
-					.withSelfRel();
-			telefone.add(linkProprioCadastrarTelefone);
-			
+					
 			Link linkProprioAtualizarTelefone = WebMvcLinkBuilder
 					.linkTo(WebMvcLinkBuilder
 							.methodOn(TelefoneControle.class)
@@ -44,16 +38,9 @@ public class AdicionadorLinkTelefone implements AdicionadorLink<Telefone> {
 					.withSelfRel();
 			telefone.add(linkProprioAtualizarTelefone);
 			
-			Link linkProprioExcluirTelefone = WebMvcLinkBuilder
-					.linkTo(WebMvcLinkBuilder
-							.methodOn(TelefoneControle.class)
-							.excluirTelefone(telefone, id))
-					.withSelfRel();
-			telefone.add(linkProprioExcluirTelefone);	
-			
 		}
 	}
-
+	
 	@Override
 	public void adicionarLink(Telefone objeto) {
 		Link linkProprioObterTelefone = WebMvcLinkBuilder
@@ -70,13 +57,6 @@ public class AdicionadorLinkTelefone implements AdicionadorLink<Telefone> {
 				.withRel("telefones");
 		objeto.add(linkProprioObterTelefones);
 		
-		Link linkProprioCadastrarTelefone = WebMvcLinkBuilder
-				.linkTo(WebMvcLinkBuilder
-						.methodOn(TelefoneControle.class)
-						.cadastrarTelefone(objeto, id))
-				.withRel("cadastrarTelefone");
-		objeto.add(linkProprioCadastrarTelefone);
-		
 		Link linkProprioAtualizarTelefone = WebMvcLinkBuilder
 				.linkTo(WebMvcLinkBuilder
 						.methodOn(TelefoneControle.class)
@@ -84,12 +64,18 @@ public class AdicionadorLinkTelefone implements AdicionadorLink<Telefone> {
 				.withRel("atualizarTelefone");
 		objeto.add(linkProprioAtualizarTelefone);
 		
+	}
+	
+	
+	@Override
+	public void adicionarLink(Telefone objeto, Cliente cliente) {
 		Link linkProprioExcluirTelefone = WebMvcLinkBuilder
 				.linkTo(WebMvcLinkBuilder
 						.methodOn(TelefoneControle.class)
-						.excluirTelefone(objeto, id))
+						.excluirTelefone(objeto, cliente.getId()))
 				.withRel("excluirTelefone");
 		objeto.add(linkProprioExcluirTelefone);
 		
 	}
+
 }

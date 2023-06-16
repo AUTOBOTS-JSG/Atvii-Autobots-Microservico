@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.autobots.automanager.adicionadores.AdicionadorLinkTelefone;
 import com.autobots.automanager.entidades.Cliente;
 import com.autobots.automanager.entidades.Telefone;
+import com.autobots.automanager.modelo.ClienteTelefoneSelecionador;
 import com.autobots.automanager.modelo.TelefoneAtualizador;
 import com.autobots.automanager.modelo.TelefoneSelecionador;
 import com.autobots.automanager.repositorios.ClienteRepositorio;
@@ -32,6 +33,8 @@ public class TelefoneControle {
 	@Autowired
 	private TelefoneSelecionador selecionadorTelefone;
 	@Autowired
+	private ClienteTelefoneSelecionador selecionadorCliTelefone;
+	@Autowired
 	private AdicionadorLinkTelefone adicionadorLinkTelefone;
 
 	@GetMapping("/telefone/{id}")
@@ -43,6 +46,11 @@ public class TelefoneControle {
 			return resposta;
 		} else {
 			adicionadorLinkTelefone.adicionarLink(telefone);
+			List<Cliente> clientes = repositorioCliente.findAll();
+			for (Telefone tel : telefones) {
+				Cliente	cliente = selecionadorCliTelefone.selecionar(clientes, telefone);
+				adicionadorLinkTelefone.adicionarLink(tel, cliente);
+			}
 			ResponseEntity<Telefone> resposta = new ResponseEntity<Telefone>(telefone, HttpStatus.FOUND);
 			return resposta;
 		} 
@@ -56,6 +64,11 @@ public class TelefoneControle {
 			return resposta;
 		} else {
 			adicionadorLinkTelefone.adicionarLink(telefones);
+			List<Cliente> clientes = repositorioCliente.findAll();
+			for (Telefone telefone : telefones) {
+				Cliente	cliente = selecionadorCliTelefone.selecionar(clientes, telefone);
+				adicionadorLinkTelefone.adicionarLink(telefone, cliente);
+			}
 			ResponseEntity<List<Telefone>> resposta = new ResponseEntity<>(telefones, HttpStatus.FOUND);
 			return resposta;
 		}
@@ -82,6 +95,7 @@ public class TelefoneControle {
 			TelefoneAtualizador atualizador = new TelefoneAtualizador();
 			atualizador.atualizar(telefone, atualizacao);
 			repositorioTelefone.save(telefone);
+			adicionadorLinkTelefone.adicionarLink(telefone);
 			status = HttpStatus.OK;
 		} else {
 			status = HttpStatus.BAD_REQUEST;

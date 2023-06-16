@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.autobots.automanager.adicionadores.AdicionadorLinkDocumento;
 import com.autobots.automanager.entidades.Cliente;
 import com.autobots.automanager.entidades.Documento;
+import com.autobots.automanager.modelo.ClienteDocumentoSelecionador;
 import com.autobots.automanager.modelo.DocumentoAtualizador;
 import com.autobots.automanager.modelo.DocumentoSelecionador;
 import com.autobots.automanager.repositorios.ClienteRepositorio;
@@ -32,6 +33,8 @@ public class DocumentoControle {
 	@Autowired
 	private DocumentoSelecionador selecionadorDocumento;
 	@Autowired
+	private ClienteDocumentoSelecionador selecionadorCliDocumento;
+	@Autowired
 	private AdicionadorLinkDocumento adicionadorLinkDocumento;
 
 	@GetMapping("/documento/{id}")
@@ -43,6 +46,11 @@ public class DocumentoControle {
 			return resposta;
 		} else {
 			adicionadorLinkDocumento.adicionarLink(documento);
+			List<Cliente> clientes = repositorioCliente.findAll();
+			for (Documento doc : documentos) {
+				Cliente	cliente = selecionadorCliDocumento.selecionar(clientes, documento);
+				adicionadorLinkDocumento.adicionarLink(doc, cliente);
+			}
 			ResponseEntity<Documento> resposta = new ResponseEntity<Documento>(documento, HttpStatus.FOUND);
 			return resposta;
 		}
@@ -56,6 +64,11 @@ public class DocumentoControle {
 			return resposta;
 		} else {
 			adicionadorLinkDocumento.adicionarLink(documentos);
+			List<Cliente> clientes = repositorioCliente.findAll();
+			for (Documento documento : documentos) {
+				Cliente	cliente = selecionadorCliDocumento.selecionar(clientes, documento);
+				adicionadorLinkDocumento.adicionarLink(documento, cliente);
+			}
 			ResponseEntity<List<Documento>> resposta = new ResponseEntity<>(documentos, HttpStatus.FOUND);
 			return resposta;
 		}
@@ -81,6 +94,7 @@ public class DocumentoControle {
 			DocumentoAtualizador atualizador = new DocumentoAtualizador();
 			atualizador.atualizar(documento, atualizacao);
 			repositorioDocumento.save(documento);
+			adicionadorLinkDocumento.adicionarLink(documento);
 			status = HttpStatus.OK;
 		} else {
 			status = HttpStatus.BAD_REQUEST;
