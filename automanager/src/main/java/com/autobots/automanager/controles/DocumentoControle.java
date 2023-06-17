@@ -108,14 +108,7 @@ public class DocumentoControle {
 		Documento documento = repositorioDocumento.getById(exclusao.getId());
 		if (documento != null) {
 			Cliente cliente = repositorioCliente.getById(id);
-			List<Documento> documentosCliente = cliente.getDocumentos();
-			for (Documento doc : documentosCliente) {
-		        if (doc.getId() == exclusao.getId()) {
-		            documentosCliente.remove(doc);
-		            break;
-		        }
-		    }
-		    cliente.setDocumentos(documentosCliente);
+			cliente.getDocumentos().remove(documento);
 			repositorioCliente.save(cliente);
 			status = HttpStatus.OK;
 		}
@@ -123,3 +116,4 @@ public class DocumentoControle {
 		
 	}
 }
+	

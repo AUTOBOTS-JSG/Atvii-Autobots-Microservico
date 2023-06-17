@@ -15,9 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.autobots.automanager.adicionadores.AdicionadorLinkCliente;
+import com.autobots.automanager.adicionadores.AdicionadorLinkDocumento;
+import com.autobots.automanager.adicionadores.AdicionadorLinkEndereco;
+import com.autobots.automanager.adicionadores.AdicionadorLinkTelefone;
 import com.autobots.automanager.entidades.Cliente;
+import com.autobots.automanager.entidades.Documento;
+import com.autobots.automanager.entidades.Telefone;
 import com.autobots.automanager.modelo.ClienteAtualizador;
+import com.autobots.automanager.modelo.ClienteDocumentoSelecionador;
 import com.autobots.automanager.modelo.ClienteSelecionador;
+import com.autobots.automanager.modelo.ClienteTelefoneSelecionador;
+import com.autobots.automanager.modelo.DocumentoSelecionador;
+import com.autobots.automanager.modelo.TelefoneSelecionador;
 import com.autobots.automanager.repositorios.ClienteRepositorio;
 
 @RestController
@@ -28,7 +37,21 @@ public class ClienteControle {
 	@Autowired
 	private ClienteSelecionador selecionador;
 	@Autowired
+	private ClienteDocumentoSelecionador selecionadorCliDocumento;
+	@Autowired
+	private DocumentoSelecionador selecionadorDocumento;
+	@Autowired
 	private AdicionadorLinkCliente adicionadorLink;
+	@Autowired
+	private AdicionadorLinkDocumento adicionadorLinkDocumento;
+	@Autowired
+	private AdicionadorLinkEndereco adicionadorLinkEndereco;
+	@Autowired
+	private TelefoneSelecionador selecionadorTelefone;
+	@Autowired
+	private ClienteTelefoneSelecionador selecionadorCliTelefone;
+	@Autowired
+	private AdicionadorLinkTelefone adicionadorLinkTelefone;
 
 	@GetMapping("/cliente/{id}")
 	public ResponseEntity<Cliente> obterCliente(@PathVariable long id) {
@@ -39,6 +62,22 @@ public class ClienteControle {
 			return resposta;
 		} else {
 			adicionadorLink.adicionarLink(cliente);
+			for (Documento doc : cliente.getDocumentos()) {
+				Documento documento = selecionadorDocumento.selecionar(cliente.getDocumentos(), doc.getId());
+				adicionadorLinkDocumento.adicionarLink(documento);
+				cliente = selecionadorCliDocumento.selecionar(clientes, doc);
+				adicionadorLinkDocumento.adicionarLink(doc, cliente);
+			}
+			if (!(cliente.getEndereco() == null)) {
+				adicionadorLinkEndereco.adicionarLink(cliente.getEndereco());
+				adicionadorLinkEndereco.adicionarLink(cliente.getEndereco(), cliente);
+			}
+			for (Telefone tel : cliente.getTelefones()) {
+				Telefone telefone = selecionadorTelefone.selecionar(cliente.getTelefones(), tel.getId());
+				adicionadorLinkTelefone.adicionarLink(telefone);
+				cliente = selecionadorCliTelefone.selecionar(clientes, telefone);
+				adicionadorLinkTelefone.adicionarLink(tel, cliente);
+			}
 			ResponseEntity<Cliente> resposta = new ResponseEntity<Cliente>(cliente, HttpStatus.FOUND);
 			return resposta;
 		}
@@ -52,10 +91,29 @@ public class ClienteControle {
 			return resposta;
 		} else {
 			adicionadorLink.adicionarLink(clientes);
-			ResponseEntity<List<Cliente>> resposta = new ResponseEntity<>(clientes, HttpStatus.FOUND);
-			return resposta;
+			for (Cliente cliente : clientes) {		
+				for (Documento doc : cliente.getDocumentos()) {
+					Documento documento = selecionadorDocumento.selecionar(cliente.getDocumentos(), doc.getId());
+					adicionadorLinkDocumento.adicionarLink(documento);
+					cliente = selecionadorCliDocumento.selecionar(clientes, doc);
+					adicionadorLinkDocumento.adicionarLink(doc, cliente);
+				}
+				if (!(cliente.getEndereco() == null)) {
+					adicionadorLinkEndereco.adicionarLink(cliente.getEndereco());
+					adicionadorLinkEndereco.adicionarLink(cliente.getEndereco(), cliente);
+				}
+				for (Telefone tel : cliente.getTelefones()) {
+					Telefone telefone = selecionadorTelefone.selecionar(cliente.getTelefones(), tel.getId());
+					adicionadorLinkTelefone.adicionarLink(telefone);
+					cliente = selecionadorCliTelefone.selecionar(clientes, telefone);
+					adicionadorLinkTelefone.adicionarLink(tel, cliente);
+				}
+			}
 		}
+		ResponseEntity<List<Cliente>> resposta = new ResponseEntity<>(clientes, HttpStatus.FOUND);
+		return resposta;
 	}
+
 
 	@PostMapping("/cadastro")
 	public ResponseEntity<?> cadastrarCliente(@RequestBody Cliente cliente) {

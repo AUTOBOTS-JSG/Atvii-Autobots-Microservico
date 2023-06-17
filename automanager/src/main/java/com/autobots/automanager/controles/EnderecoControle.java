@@ -110,7 +110,6 @@ public class EnderecoControle {
 		if (cliente.getEndereco()!= null) {
 		    cliente.setEndereco(null);
 		    repositorioCliente.save(cliente);
-		    adicionadorLinkEndereco.adicionarLink(cliente.getEndereco(), cliente);
 			status = HttpStatus.OK;
 		}
 		return new ResponseEntity<>(status);

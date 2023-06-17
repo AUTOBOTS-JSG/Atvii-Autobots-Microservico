@@ -110,14 +110,7 @@ public class TelefoneControle {
 		Telefone telefone = repositorioTelefone.getById(exclusao.getId());
 		if (telefone != null) {
 			Cliente cliente = repositorioCliente.getById(id);
-			List<Telefone> telefonesCliente = cliente.getTelefones();
-			for (Telefone tel : telefonesCliente) {
-		        if (tel.getId() == exclusao.getId()) {
-		            telefonesCliente.remove(tel);
-		            break;
-		        }
-		    }
-		    cliente.setTelefones(telefonesCliente);
+			cliente.getTelefones().remove(telefone);
 			repositorioCliente.save(cliente);
 			status = HttpStatus.OK;
 		}
